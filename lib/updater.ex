@@ -29,6 +29,14 @@ defmodule Elixometer.Updater do
     :pobox.post(:elixometer_pobox, {:gauge, name, value})
   end
 
+  def fast_counter(_name, {m, f}, _reset_seconds) do
+    apply(m, f, [])
+  end
+
+  def declare_fast_counter(name, target, reset_seconds) do
+    :pobox.post(:elixometer_pobox, {:declare_fast_counter, name, target, reset_seconds})
+  end
+
   def counter(name, delta, reset_seconds) do
     :pobox.post(:elixometer_pobox, {:counter, name, delta, reset_seconds})
   end
@@ -76,6 +84,7 @@ defmodule Elixometer.Updater do
     :exometer.update(monitor, delta)
   end
 
+
   def do_update({:counter, name, delta, reset_seconds}, formatter) do
     monitor = do_format(formatter, :counters, name)
 
@@ -90,6 +99,20 @@ defmodule Elixometer.Updater do
     end)
 
     :exometer.update(monitor, delta)
+  end
+
+
+  def do_update({:declare_fast_counter, name, {m, f}, reset_seconds}, formatter) do
+    monitor = do_format(formatter, :counters, name)
+    :exometer.new(monitor, :fast_counter, [{:function, {m, f}}])
+    if is_nil(reset_seconds) do
+      add_counter(monitor)
+    else
+      add_counter(monitor, reset_seconds * 1000)
+    end
+    Elixometer.subscribe(monitor)
+  rescue
+    e in ErlangError -> e
   end
 
   def do_update({:gauge, name, value}, formatter) do

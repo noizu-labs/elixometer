@@ -271,6 +271,28 @@ defmodule Elixometer do
     Updater.spiral(name, delta, opts)
   end
 
+
+  @doc """
+  Updates a fast_counter metric. The metric must be manually linked to a function call for tracing.
+  """
+  @spec update_fast_counter(String.t(), integer, reset_seconds: nil | integer) :: :ok
+  def update_fast_counter(name, target, [reset_seconds: secs] \\ [reset_seconds: nil])
+      when is_bitstring(name) and (is_nil(secs) or secs >= 1) do
+    Updater.fast_counter(name, target, secs)
+  end
+
+  @doc """
+  Declare a fast counter.
+  """
+  @spec declare_fast_counter(String.t(), integer, reset_seconds: nil | integer) :: :ok
+  def declare_fast_counter(name, target, [reset_seconds: secs] \\ [reset_seconds: nil])
+      when is_bitstring(name) and (is_nil(secs) or secs >= 1) do
+    Updater.declare_fast_counter(name, target, secs)
+  end
+
+
+
+
   @doc """
   Updates a counter metric. If the metric doesn't exist, the metric is created
   and the metric is subscribed to the default reporter.
