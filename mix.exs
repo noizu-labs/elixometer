@@ -11,8 +11,8 @@ defmodule Elixometer.Mixfile do
   def project do
     [
       app: :elixometer,
-      version: "1.4.2",
-      elixir: ">= 1.5.0",
+      version: "1.5.0",
+      elixir: ">= 1.7.0",
       description: @description,
       source_url: @project_url,
       homepage_url: @project_url,
@@ -34,6 +34,7 @@ defmodule Elixometer.Mixfile do
       name: "Elixometer",
       docs: [
         main: "Elixometer",
+        source_ref: "master",
         source_url: @project_url
       ]
     ]
@@ -42,8 +43,7 @@ defmodule Elixometer.Mixfile do
   def application do
     [
       mod: {Elixometer.App, []},
-      applications: [:lager, :exometer_core, :pobox],
-      erl_opts: [parse_transform: "lager_transform"],
+      extra_applications: [:logger],
       env: default_config(Mix.env())
     ]
   end
@@ -58,9 +58,6 @@ defmodule Elixometer.Mixfile do
 
   defp deps do
     [
-      # lager 3.2.1 is needed for erl19 because of
-      # https://github.com/basho/lager/pull/321
-      {:lager, ">= 3.2.1"},
       {:exometer_core, "~> 1.6"},
       {:dialyxir, "~> 1.1.0", only: :dev, runtime: false},
       {:ex_doc, "~> 0.25", only: :dev},
